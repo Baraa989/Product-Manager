@@ -1,0 +1,23 @@
+{
+  "name": "product-manager",
+  "version": "1.0.0",
+  "description": "Product Manager - Web API med Express, SQLite och dynamisk frontend",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "keywords": [
+    "express",
+    "sqlite",
+    "crud",
+    "product-manager"
+  ],
+  "author": "Baraa",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "express": "^5.3.0"
+  }
+}
