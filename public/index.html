@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Produktadministration - Enkel och effektiv hantering av produkter med Express och SQLite.">
+  <title>Product Manager - Produktadministration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Toppmeny / Header -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+        </svg>
+        <span class="logo-text">Product Manager</span>
+      </div>
+      <div class="header-status">
+        <span class="status-indicator"></span>
+        <span class="status-text">API Online</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Huvudinnehåll -->
+  <main class="main-container">
+    <div class="card">
+      <h1 class="page-title">Produktadministration</h1>
+
+      <!-- Fel- och informationsmeddelanden -->
+      <div id="alert-box" class="alert hidden" role="alert" aria-live="polite">
+        <span id="alert-icon" class="alert-icon"></span>
+        <span id="alert-message" class="alert-message"></span>
+      </div>
+
+      <!-- Formulär för att lägga till produkt -->
+      <form id="product-form" class="product-form" novalidate>
+        <div class="form-grid">
+          <!-- Produktnamn -->
+          <div class="form-group">
+            <label for="name">Produktnamn <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              placeholder="t.ex. Svart T-Shirt" 
+              required
+              autocomplete="off"
+            >
+            <span class="error-hint" id="name-error"></span>
+          </div>
+
+          <!-- Pris -->
+          <div class="form-group">
+            <label for="price">Pris (SEK) <span class="required">*</span></label>
+            <input 
+              type="number" 
+              id="price" 
+              name="price" 
+              placeholder="t.ex. 199" 
+              min="0.01" 
+              step="any" 
+              required
+            >
+            <span class="error-hint" id="price-error"></span>
+          </div>
+
+          <!-- SKU -->
+          <div class="form-group full-width">
+            <label for="sku">SKU <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="sku" 
+              name="sku" 
+              placeholder="t.ex. TSH-001" 
+              required
+              autocomplete="off"
+            >
+            <span class="error-hint" id="sku-error"></span>
+          </div>
+
+          <!-- Beskrivning -->
+          <div class="form-group full-width">
+            <label for="description">Beskrivning <span class="required">*</span></label>
+            <textarea 
+              id="description" 
+              name="description" 
+              rows="4" 
+              placeholder="Skriv en detaljerad beskrivning av produkten här..." 
+              required
+            ></textarea>
+            <span class="error-hint" id="description-error"></span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" id="add-product-btn" class="btn btn-primary">
+            <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+            </svg>
+            <span>Lägg till produkt</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Produkttabell -->
+      <section class="table-section">
+        <div class="table-header-info">
+          <h2>Befintliga produkter</h2>
+          <span id="product-count" class="badge">0 produkter</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="products-table" id="products-table">
+            <thead>
+              <tr>
+                <th scope="col" class="col-product">Produkt</th>
+                <th scope="col" class="col-sku">SKU</th>
+                <th scope="col" class="col-price">Pris</th>
+                <th scope="col" class="col-actions"><span class="sr-only">Åtgärder</span></th>
+              </tr>
+            </thead>
+            <tbody id="products-tbody">
+              <!-- Dynamiskt innehåll via fetch() -->
+            </tbody>
+          </table>
+
+          <!-- Laddningsindikator -->
+          <div id="loading-spinner" class="loading-state">
+            <div class="spinner"></div>
+            <p>Hämtar produkter från backend...</p>
+          </div>
+
+          <!-- Tom lista meddelande -->
+          <div id="empty-state" class="empty-state hidden">
+            <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            </svg>
+            <p>Inga produkter inlagda ännu. Fyll i formuläret ovan för att lägga till din första produkt!</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal för att redigera produkt (Update i CRUD) -->
+  <dialog id="edit-modal" class="modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Redigera produkt</h3>
+        <button type="button" id="close-modal-btn" class="btn-close" aria-label="Stäng modal">&times;</button>
+      </div>
+
+      <form id="edit-form" class="modal-form" novalidate>
+        <input type="hidden" id="edit-id" name="id">
+
+        <div class="form-group">
+          <label for="edit-name">Produktnamn <span class="required">*</span></label>
+          <input type="text" id="edit-name" name="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-price">Pris (SEK) <span class="required">*</span></label>
+          <input type="number" id="edit-price" name="price" min="0.01" step="any" required>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-sku">SKU <span class="required">*</span></label>
+          <input type="text" id="edit-sku" name="sku" required>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-description">Beskrivning <span class="required">*</span></label>
+          <textarea id="edit-description" name="description" rows="4" required></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" id="cancel-edit-btn" class="btn btn-secondary">Avbryt</button>
+          <button type="submit" id="save-edit-btn" class="btn btn-primary">Spara ändringar</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
